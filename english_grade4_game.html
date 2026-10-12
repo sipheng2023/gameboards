@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເກມທາຍຄຳສັບ ວິຊາ ພາສາອັງກິດ ປ.4 (Grade 4 English Quiz)</title>
+    <style>
+        body {
+            font-family: 'Phetsarath OT', 'Saysana', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #2d3436;
+        }
+        .game-container {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 680px;
+            padding: 30px;
+            text-align: center;
+            border: 5px solid #ff6b6b;
+        }
+        h1 {
+            color: #ee5253;
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+        .subtitle {
+            color: #576574;
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            background: #ffeaa7;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #d63031;
+            border: 2px solid #fdcb6e;
+        }
+        .question-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 8px solid #ee5253;
+            text-align: left;
+        }
+        .clue {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d3436;
+            line-height: 1.6;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .choice-btn {
+            background-color: #10ac84;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #0e8869;
+            text-align: left;
+        }
+        .choice-btn:hover {
+            background-color: #1dd1a1;
+            color: #2d3436;
+        }
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .feedback {
+            font-size: 19px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 35px;
+        }
+        .next-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #ee5253;
+        }
+        .next-btn:hover {
+            background-color: #ff8787;
+        }
+        .restart-btn {
+            background-color: #10ac84;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #0e8869;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🇬🇧 ເກມທາຍຄຳສັບ ວິຊາ ພາສາອັງກິດ ປ.4 🔤</h1>
+    <div class="subtitle">Fun English Vocabulary & Grammar Game for Grade 4</div>
+    
+    <div class="score-board">
+        <div>ຄຳຖາມທີ: <span id="current-q">1</span> / 10</div>
+        <div>ຄະແນນ: <span id="score">0</span> 🌟</div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-box">
+            <div id="clue" class="clue">ຄຳຖາມ...</div>
+        </div>
+        <div class="choices" id="choices-container">
+            <!-- Choices inserted via JS -->
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" class="next-btn" onclick="nextQuestion()">ຄຳຖາມຕໍ່ໄປ ➡️</button>
+    </div>
+
+    <div id="end-screen" style="display: none;">
+        <h2>🎉 ຫຼິ້ນເກມຈົບແລ້ວ! Great Job! 🎉</h2>
+        <p id="final-message" style="font-size: 20px; margin: 20px 0;"></p>
+        <button class="restart-btn" onclick="restartGame()">ຫຼິ້ນອີກຄັ້ງ 🔄</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            clue: "ຄຳສັບພາສາອັງກິດໃດແປວ່າ 'ໂຮງຮຽນ'?",
+            answer: "School",
+            choices: ["School", "Hospital", "Market", "House"]
+        },
+        {
+            clue: "ຈົ່ງເລືອກຄຳສັບທີ່ຖືກຕ້ອງຕື່ມໃສ່ບ່ອນຫວ່າງ: 'She ______ a student.'",
+            answer: "is",
+            choices: ["is", "am", "are", "be"]
+        },
+        {
+            clue: "ຄຳສັບ 'Apple' ແປວ່າຫຍັງໃນພາສາລາວ?",
+            answer: "ໝາກແອບເປິ້ນ",
+            choices: ["ໝາກແອບເປິ້ນ", "ໝາກກ້ວຍ", "ໝາກມ່ວງ", "ໝາກສ້ມ"]
+        },
+        {
+            clue: "ຄຳວ່າ 'Yellow' ແມ່ນສີຫຍັງ?",
+            answer: "ສີເຫຼືອງ",
+            choices: ["ສີເຫຼືອງ", "ສີແດງ", "ສີຟ້າ", "ສີຂຽວ"]
+        },
+        {
+            clue: "ຈົ່ງເລືອກຄຳສັບທີ່ຖືກຕ້ອງ: 'I have two ______.' (ຂ້ອຍມີຕາສອງດວງ)",
+            answer: "eyes",
+            choices: ["eyes", "eye", "ear", "nose"]
+        },
+        {
+            clue: "ຄຳສັບໃດແປວ່າ 'ມື້ນີ້ແມ່ນວັນຈັນ'?",
+            answer: "Today is Monday.",
+            choices: ["Today is Monday.", "Today is Sunday.", "Today is Friday.", "Today is Tuesday."]
+        },
+        {
+            clue: "ຄຳສັບໃດແມ່ນສັດທີ່ສາມາດບິນໄດ້?",
+            answer: "Bird",
+            choices: ["Bird", "Dog", "Fish", "Cat"]
+        },
+        {
+            clue: "ຄຳທັກທາຍ 'Good morning' ໃຊ້ທັກທາຍໃນຕອນໃດ?",
+            answer: "ຕອນເຊົ້າ",
+            choices: ["ຕອນເຊົ້າ", "ຕອນສາຍ", "ຕອນແລງ", "ຕອນກາງຄືນ"]
+        },
+        {
+            clue: "ຈົ່ງເລືອກຕົວເລກທີ່ຖືກຕ້ອງ: 'Ten' ແປວ່າຈຳນວນເທົ່າໃດ?",
+            answer: "10",
+            choices: ["10", "5", "8", "12"]
+        },
+        {
+            clue: "ຄຳສັບໃດແປວ່າ 'ອາຈານ / ຄູ'?",
+            answer: "Teacher",
+            choices: ["Teacher", "Doctor", "Student", "Police"]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function loadQuestion() {
+        answered = false;
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const q = questions[currentQuestionIndex];
+        document.getElementById('current-q').textContent = currentQuestionIndex + 1;
+        document.getElementById('score').textContent = score;
+        document.getElementById('clue').textContent = "🔍 " + q.clue;
+
+        const choicesContainer = document.getElementById('choices-container');
+        choicesContainer.innerHTML = '';
+
+        // Shuffle choices
+        let shuffledChoices = [...q.choices].sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = choice;
+            btn.onclick = () => selectAnswer(choice, q.answer, btn);
+            choicesContainer.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(selected, correct, buttonElement) {
+        if (answered) return;
+        answered = true;
+
+        const allButtons = document.querySelectorAll('.choice-btn');
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === correct) {
+                btn.style.backgroundColor = '#10ac84';
+            }
+        });
+
+        const feedback = document.getElementById('feedback');
+        if (selected === correct) {
+            score++;
+            document.getElementById('score').textContent = score;
+            feedback.textContent = "✅ Correct! ຖືກຕ້ອງແລ້ວ! 🎉";
+            feedback.style.color = "#10ac84";
+            buttonElement.style.backgroundColor = '#10ac84';
+        } else {
+            feedback.textContent = `❌ Incorrect! ຄຳຕອບທີ່ຖືກຕ້ອງແມ່ນ: "${correct}".`;
+            feedback.style.color = "#ee5253";
+            buttonElement.style.backgroundColor = '#ee5253';
+        }
+
+        if (currentQuestionIndex < questions.length - 1) {
+            document.getElementById('next-btn').style.display = 'inline-block';
+        } else {
+            setTimeout(showEndScreen, 1500);
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function showEndScreen() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        
+        const finalMessage = document.getElementById('final-message');
+        if (score === 10) {
+            finalMessage.innerHTML = `🏆 Full Score 10/10! You are an English Superstar! 🌟🌟🌟`;
+        } else if (score >= 7) {
+            finalMessage.innerHTML = `⭐ Excellent! You got ${score} out of 10! ເກັ່ງຫຼາຍ! 📖`;
+        } else {
+            finalMessage.innerHTML = `👍 Good job! You got ${score} out of 10. Try again for a higher score! 🚀`;
+        }
+    }
+
+    function restartGame() {
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('end-screen').style.display = 'none';
+        loadQuestion();
+    }
+
+    // Initialize game
+    loadQuestion();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເກມທົບທວນຄວາມຮູ້ ວິຊາ IT: ຄອມພິວເຕີ ແລະ ອຸປະກອນຕ່າງໆ</title>
+    <style>
+        body {
+            font-family: 'Phetsarath OT', 'Saysana', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        .game-container {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            text-align: center;
+            border: 5px solid #00adb5;
+            color: #222831;
+        }
+        h1 {
+            color: #00adb5;
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+        .subtitle {
+            color: #393e46;
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            background: #eeeeee;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #222831;
+            border: 2px solid #00adb5;
+        }
+        .question-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 8px solid #00adb5;
+            text-align: left;
+        }
+        .clue {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #222831;
+            line-height: 1.6;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .choice-btn {
+            background-color: #393e46;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 17px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #222831;
+            text-align: left;
+        }
+        .choice-btn:hover {
+            background-color: #00adb5;
+            color: #ffffff;
+        }
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .feedback {
+            font-size: 19px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 35px;
+        }
+        .next-btn {
+            background-color: #00adb5;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #007a80;
+        }
+        .next-btn:hover {
+            background-color: #008c93;
+        }
+        .restart-btn {
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #e64a19;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>💻 ເກມທົດສອບຄວາມຮູ້ IT: ຄອມພິວເຕີ ແລະ ອຸປະກອນຕ່າງໆ 🖥️</h1>
+    <div class="subtitle">ທົບທວນຄວາມຮູ້ກ່ຽວກັບ Hardware, Software, ແລະ ອຸປະກອນຕໍ່ພ່ວງ</div>
+    
+    <div class="score-board">
+        <div>ຄຳຖາມທີ: <span id="current-q">1</span> / 10</div>
+        <div>ຄະແນນ: <span id="score">0</span> 🌟</div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-box">
+            <div id="clue" class="clue">ຄຳຖາມ...</div>
+        </div>
+        <div class="choices" id="choices-container">
+            <!-- Choices inserted via JS -->
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" class="next-btn" onclick="nextQuestion()">ຄຳຖາມຕໍ່ໄປ ➡️</button>
+    </div>
+
+    <div id="end-screen" style="display: none;">
+        <h2>🎉 ຫຼິ້ນເກມຈົບແລ້ວ! ເກັ່ງຫຼາຍ! 🎉</h2>
+        <p id="final-message" style="font-size: 20px; margin: 20px 0;"></p>
+        <button class="restart-btn" onclick="restartGame()">ຫຼິ້ນອີກຄັ້ງ 🔄</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            clue: "ອຸປະກອນໃດເຮັດໜ້າທີ່ເປັນ 'ສົມອງ' ຂອງຄອມພິວເຕີ ໃນການປະມວນຜົນຂໍ້ມູນ?",
+            answer: "CPU (Central Processing Unit)",
+            choices: ["CPU (Central Processing Unit)", "RAM (Random Access Memory)", "Hard Disk", "Power Supply"]
+        },
+        {
+            clue: "ອຸປະກອນໃດຈັດຢູ່ໃນປະເພດ 'ອຸປະກອນປ້ອນຂໍ້ມູນ' (Input Device)?",
+            answer: "ແປ້ນພິມ (Keyboard)",
+            choices: ["ແປ້ນພິມ (Keyboard)", "ຈໍພາບ (Monitor)", "ເຄື່ອງພິມ (Printer)", "ລຳໂພງ (Speaker)"]
+        },
+        {
+            clue: "ໜ່ວຍຄວາມຈຳຊົ່ວຄາວທີ່ຊ່ວຍໃຫ້ຄອມພິວເຕີທຳງານໄດ້ໄວຂຶ້ນ ເມື່ອປິດເຄື່ອງຂໍ້ມູນຈະຫາຍໄປ ແມ່ນຫຍັງ?",
+            answer: "RAM",
+            choices: ["RAM", "ROM", "SSD", "Flash Drive"]
+        },
+        {
+            clue: "ອຸປະກອນໃດຈັດຢູ່ໃນປະເພດ 'ອຸປະກອນສະແດງຜົນ' (Output Device)?",
+            answer: "ຈໍພາບ (Monitor)",
+            choices: ["ຈໍພາບ (Monitor)", "ເມົາສ໌ (Mouse)", "ສະແກນເນີ (Scanner)", "ໄມໂຄຣໂຟນ (Microphone)"]
+        },
+        {
+            clue: "ອຸປະກອນໃດທີ່ໃຊ້ສຳລັບເກັບຮັກສາຂໍ້ມູນແບບຖາວອນ ເຖິງວ່າປິດເຄື່ອງຂໍ້ມູນກໍບໍ່ຫາຍ?",
+            answer: "Hard Disk / SSD",
+            choices: ["Hard Disk / SSD", "RAM", "CPU", "Cache"]
+        },
+        {
+            clue: "ແຜ່ນວົງຈອນຫຼັກທີ່ເຊື່ອມຕໍ່ອຸປະກອນທຸກຢ່າງຂອງຄອມພິວເຕີເຂົ້າກັນ ເອີ້ນວ່າຫຍັງ?",
+            answer: "ເມນບອດ (Motherboard)",
+            choices: ["ເມນບອດ (Motherboard)", "ກາດຈໍ (Graphic Card)", "ພາວເວີຊັບພາຍ (Power Supply)", "ເຄສ (Case)"]
+        },
+        {
+            clue: "ຊ່ອງທາງການເຊື່ອມຕໍ່ (Port) ໃດທີ່ນິຍົມໃຊ້ເຊື່ອມຕໍ່ ເມົາສ໌, ແປ້ນພິມ, ແລະ ແຟຼຊໄດຣຟ໌ ໃນປະຈຸບັນ?",
+            answer: "USB Port",
+            choices: ["USB Port", "VGA Port", "HDMI Port", "LAN Port"]
+        },
+        {
+            clue: "ອຸປະກອນໃດທີ່ເຮັດໜ້າທີ່ແປງສັນຍານໄຟຟ້າ ແລະ ຈ່າຍໄຟໃຫ້ກັບອຸປະກອນຕ່າງໆ ໃນຄອມພິວເຕີ?",
+            answer: "Power Supply Unit (PSU)",
+            choices: ["Power Supply Unit (PSU)", "UPS", "CPU", "Mainboard"]
+        },
+        {
+            clue: "ອຸປະກອນໃດທີ່ໃຊ້ສຳລັບສຳເນົາເອກະສານ ຫຼື ຮູບພາບ ຈາກເຈ້ຍເຂົ້າໄປໃນຄອມພິວເຕີ?",
+            answer: "ສະແກນເນີ (Scanner)",
+            choices: ["ສະແກນເນີ (Scanner)", "ເຄື່ອງພິມ (Printer)", "ໂປຣເຈັກເຕີ (Projector)", "ເວັບແຄມ (Webcam)"]
+        },
+        {
+            clue: "ອຸປະກອນໃດທີ່ຊ່ວຍສຳຮອງໄຟຟ້າ ແລະ ປ້ອງກັນຄອມພິວເຕີດັບເມື່ອໄຟຟ້າຕົກ ຫຼື ໄຟຟ້າດັບ?",
+            answer: "UPS (Uninterruptible Power Supply)",
+            choices: ["UPS (Uninterruptible Power Supply)", "Power Bank", "Power Supply", "Adapter"]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function loadQuestion() {
+        answered = false;
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const q = questions[currentQuestionIndex];
+        document.getElementById('current-q').textContent = currentQuestionIndex + 1;
+        document.getElementById('score').textContent = score;
+        document.getElementById('clue').textContent = "🔍 " + q.clue;
+
+        const choicesContainer = document.getElementById('choices-container');
+        choicesContainer.innerHTML = '';
+
+        // Shuffle choices
+        let shuffledChoices = [...q.choices].sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = choice;
+            btn.onclick = () => selectAnswer(choice, q.answer, btn);
+            choicesContainer.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(selected, correct, buttonElement) {
+        if (answered) return;
+        answered = true;
+
+        const allButtons = document.querySelectorAll('.choice-btn');
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === correct) {
+                btn.style.backgroundColor = '#00b894';
+            }
+        });
+
+        const feedback = document.getElementById('feedback');
+        if (selected === correct) {
+            score++;
+            document.getElementById('score').textContent = score;
+            feedback.textContent = "✅ ຖືກຕ້ອງ! ເກັ່ງຫຼາຍ! 🎉";
+            feedback.style.color = "#00b894";
+            buttonElement.style.backgroundColor = '#00b894';
+        } else {
+            feedback.textContent = `❌ ຜິດ! ຄຳຕອບທີ່ຖືກຕ້ອງແມ່ນ: "${correct}".`;
+            feedback.style.color = "#d63031";
+            buttonElement.style.backgroundColor = '#d63031';
+        }
+
+        if (currentQuestionIndex < questions.length - 1) {
+            document.getElementById('next-btn').style.display = 'inline-block';
+        } else {
+            setTimeout(showEndScreen, 1500);
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function showEndScreen() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        
+        const finalMessage = document.getElementById('final-message');
+        if (score === 10) {
+            finalMessage.innerHTML = `🏆 ຄະແນນເຕັມ 10! ເຈົ້າເປັນຜູ້ຊ່ຽວຊານດ້ານ IT ແທ້ໆ! 🌟🌟🌟`;
+        } else if (score >= 7) {
+            finalMessage.innerHTML = `⭐ ຍອດຢ້ຽມ! ເຈົ້າໄດ້ ${score} ຈາກ 10 ຄະແນນ! ມີຄວາມຮູ້ IT ດີຫຼາຍ! 💻`;
+        } else {
+            finalMessage.innerHTML = `👍 ຄວາມພະຍາຍາມດີຫຼາຍ! ເຈົ້າໄດ້ ${score} ຈາກ 10 ຄະແນນ. ລອງທວນຄືນບົດຮຽນແລ້ວຫຼິ້ນໃໝ່ໄດ້ເດີ້! 🚀`;
+        }
+    }
+
+    function restartGame() {
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('end-screen').style.display = 'none';
+        loadQuestion();
+    }
+
+    // Initialize game
+    loadQuestion();
+</script>
+
+</body>
+</html>

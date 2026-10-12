@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເກມທົດສອບຄວາມຮູ້ ວິຊາ IT: ຊອບແວ (Software)</title>
+    <style>
+        body {
+            font-family: 'Phetsarath OT', 'Saysana', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #232526, #414345);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        .game-container {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            text-align: center;
+            border: 5px solid #ff6f61;
+            color: #222831;
+        }
+        h1 {
+            color: #ff6f61;
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+        .subtitle {
+            color: #393e46;
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            background: #ffebee;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #c62828;
+            border: 2px solid #ff6f61;
+        }
+        .question-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 8px solid #ff6f61;
+            text-align: left;
+        }
+        .clue {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #222831;
+            line-height: 1.6;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .choice-btn {
+            background-color: #393e46;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 17px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #222831;
+            text-align: left;
+        }
+        .choice-btn:hover {
+            background-color: #ff6f61;
+            color: #ffffff;
+        }
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .feedback {
+            font-size: 19px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 35px;
+        }
+        .next-btn {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #d9534f;
+        }
+        .next-btn:hover {
+            background-color: #e05a4c;
+        }
+        .restart-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #1e7e34;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>💿 ເກມທົດສອບຄວາມຮູ້ IT: ຊອບແວ (Software) 💻</h1>
+    <div class="subtitle">ທົບທວນຄວາມຮູ້ກ່ຽວກັບ OS, Application Software, Utility ແລະ ຄວາມປອດໄພ</div>
+    
+    <div class="score-board">
+        <div>ຄຳຖາມທີ: <span id="current-q">1</span> / 10</div>
+        <div>ຄະແນນ: <span id="score">0</span> 🌟</div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-box">
+            <div id="clue" class="clue">ຄຳຖາມ...</div>
+        </div>
+        <div class="choices" id="choices-container">
+            <!-- Choices inserted via JS -->
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" class="next-btn" onclick="nextQuestion()">ຄຳຖາມຕໍ່ໄປ ➡️</button>
+    </div>
+
+    <div id="end-screen" style="display: none;">
+        <h2>🎉 ຫຼິ້ນເກມຈົບແລ້ວ! ເກັ່ງຫຼາຍ! 🎉</h2>
+        <p id="final-message" style="font-size: 20px; margin: 20px 0;"></p>
+        <button class="restart-btn" onclick="restartGame()">ຫຼິ້ນອີກຄັ້ງ 🔄</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            clue: "ຊອບແວລະບົບປະຕິບັດການ (Operating System - OS) ຕົວໃດທີ່ນິຍົມໃຊ້ຫຼາຍທີ່ສຸດໃນຄອມພິວເຕີສ່ວນບຸກຄົນ (PC)?",
+            answer: "Microsoft Windows",
+            choices: ["Microsoft Windows", "Microsoft Word", "Google Chrome", "Adobe Photoshop"]
+        },
+        {
+            clue: "ຊອບແວປະເພດໃດທີ່ຖືກອອກແບບມາເພື່ອຊ່ວຍໃຫ້ຜູ້ໃຊ້ງານສາມາດພິມວຽກ, ພິມເອກະສານ ຫຼື ພິມບົດລາຍງານໄດ້?",
+            answer: "Word Processor (ເຊັ່ນ: Microsoft Word)",
+            choices: ["Word Processor (ເຊັ່ນ: Microsoft Word)", "Antivirus", "Operating System", "Device Driver"]
+        },
+        {
+            clue: "ຊອບແວຕົວໃດເຮັດໜ້າທີ່ປ້ອງກັນ ແລະ ກຳຈັດໄວຣັສ (Virus) ໃນຄອມພິວເຕີ?",
+            answer: "Antivirus Software",
+            choices: ["Antivirus Software", "Web Browser", "Spreadsheet Software", "Presentation Software"]
+        },
+        {
+            clue: "ໂປຣແກຣມເວັບບຣາວເຊີ (Web Browser) ຂໍ້ໃດຖືກໃຊ້ສຳລັບທ່ອງອິນເຕີເນັດ?",
+            answer: "Google Chrome / Microsoft Edge",
+            choices: ["Google Chrome / Microsoft Edge", "Microsoft Excel", "Notepad", "Paint"]
+        },
+        {
+            clue: "ຊອບແວລະບົບ (System Software) ມີໜ້າທີ່ຫຼັກຄືແນວໃດ?",
+            answer: "ຄວບຄຸມການເຮັດວຽກຂອງຮາດແວ ແລະ ເຊື່ອມຕໍ່ກັບຜູ້ໃຊ້",
+            choices: ["ຄວບຄຸມການເຮັດວຽກຂອງຮາດແວ ແລະ ເຊື່ອມຕໍ່ກັບຜູ້ໃຊ້", "ແຕ້ມຮູບພາບກາຟິກສຳລັບຄວາມບັນເທີງ", "ຄິດໄລ່ບັນຊີ ແລະ ພິມຕາຕະລາງ", "ຫຼິ້ນເກມອອນລາຍທີ່ມີພາບສາມມິຕິ"]
+        },
+        {
+            clue: "ໂປຣແກຣມ Microsoft Excel ຈັດຢູ່ໃນຊອບແວປະເພດໃດ?",
+            answer: "Spreadsheet Software (ຊອບແວຕາຕະລາງຄຳນວນ)",
+            choices: ["Spreadsheet Software (ຊອບແວຕາຕະລາງຄຳນວນ)", "Operating System", "Antivirus", "Database Management System"]
+        },
+        {
+            clue: "ລະບົບປະຕິບັດການ (OS) ໃດທີ່ຖືກພັດທະນາໂດຍບໍລິສັດ Apple ສຳລັບໃຊ້ໃນເຄື່ອງ Mac?",
+            answer: "macOS",
+            choices: ["macOS", "Windows 11", "Linux", "Android"]
+        },
+        {
+            clue: "ລະບົບປະຕິບັດການ (OS) ໃດທີ່ນິຍົມໃຊ້ຫຼາຍທີ່ສຸດໃນໂທລະສັບສະມາດໂຟນ (Smartphones) ປັດຈຸບັນ?",
+            answer: "Android ແລະ iOS",
+            choices: ["Android ແລະ iOS", "Windows 10", "MS-DOS", "Ubuntu"]
+        },
+        {
+            clue: "ຊອບແວປະເພດ Open Source ໝາຍເຖິງຫຍັງ?",
+            answer: "ຊອບແວທີ່ເປີດເຜີຍລະຫັດຕົ້ນສະບັບ ໃຫ້ຜູ້ອື່ນສາມາດນຳໄປພັດທະນາຕໍ່ໄດ້ຟຣີ",
+            choices: ["ຊອບແວທີ່ເປີດເຜີຍລະຫັດຕົ້ນສະບັບ ໃຫ້ຜູ້ອື່ນສາມາດນຳໄປພັດທະນາຕໍ່ໄດ້ຟຣີ", "ຊອບແວທີ່ຕ້ອງຊື້ລິຂະສິດລາຄາແພງເທົ່ານັ້ນ", "ຊອບແວທີ່ໃຊ້ໄດ້ສະເພາະໃນໂຮງໝໍ", "ຊອບແວທີ່ບໍ່ມີທາງອັບເດດ"]
+        },
+        {
+            clue: "ໂປຣແກຣມ Microsoft PowerPoint ມັກຖືກນຳໃຊ້ເພື່ອຈຸດປະສົງໃດ?",
+            answer: "ສ້າງບົດນຳສະເໜີ (Presentation)",
+            choices: ["ສ້າງບົດນຳສະເໜີ (Presentation)", "ສ້າງຖານຂໍ້ມູນຂະໜາດໃຫຍ່", "ຕັດຕໍ່ວິດີໂອພາບພະຍົນ", "ກຳຈັດໄວຣັສຄອມພິວເຕີ"]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function loadQuestion() {
+        answered = false;
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const q = questions[currentQuestionIndex];
+        document.getElementById('current-q').textContent = currentQuestionIndex + 1;
+        document.getElementById('score').textContent = score;
+        document.getElementById('clue').textContent = "🔍 " + q.clue;
+
+        const choicesContainer = document.getElementById('choices-container');
+        choicesContainer.innerHTML = '';
+
+        // Shuffle choices
+        let shuffledChoices = [...q.choices].sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = choice;
+            btn.onclick = () => selectAnswer(choice, q.answer, btn);
+            choicesContainer.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(selected, correct, buttonElement) {
+        if (answered) return;
+        answered = true;
+
+        const allButtons = document.querySelectorAll('.choice-btn');
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === correct) {
+                btn.style.backgroundColor = '#28a745';
+            }
+        });
+
+        const feedback = document.getElementById('feedback');
+        if (selected === correct) {
+            score++;
+            document.getElementById('score').textContent = score;
+            feedback.textContent = "✅ ຖືກຕ້ອງ! ເກັ່ງຫຼາຍ! 🎉";
+            feedback.style.color = "#28a745";
+            buttonElement.style.backgroundColor = '#28a745';
+        } else {
+            feedback.textContent = `❌ ຜິດ! ຄຳຕອບທີ່ຖືກຕ້ອງແມ່ນ: "${correct}".`;
+            feedback.style.color = "#dc3545";
+            buttonElement.style.backgroundColor = '#dc3545';
+        }
+
+        if (currentQuestionIndex < questions.length - 1) {
+            document.getElementById('next-btn').style.display = 'inline-block';
+        } else {
+            setTimeout(showEndScreen, 1500);
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function showEndScreen() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        
+        const finalMessage = document.getElementById('final-message');
+        if (score === 10) {
+            finalMessage.innerHTML = `🏆 ຄະແນນເຕັມ 10! ເຈົ້າເປັນຜູ້ຊ່ຽວຊານດ້ານຊອບແວ IT ແທ້ໆ! 🌟🌟🌟`;
+        } else if (score >= 7) {
+            finalMessage.innerHTML = `⭐ ຍອດຢ້ຽມ! ເຈົ້າໄດ້ ${score} ຈາກ 10 ຄະແນນ! ມີຄວາມຮູ້ເລື່ອງຊອບແວດີຫຼາຍ! 💻`;
+        } else {
+            finalMessage.innerHTML = `👍 ຄວາມພະຍາຍາມດີຫຼາຍ! ເຈົ້າໄດ້ ${score} ຈາກ 10 ຄະແນນ. ລອງທວນຄືນບົດຮຽນແລ້ວຫຼິ້ນໃໝ່ໄດ້ເດີ້! 🚀`;
+        }
+    }
+
+    function restartGame() {
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('end-screen').style.display = 'none';
+        loadQuestion();
+    }
+
+    // Initialize game
+    loadQuestion();
+</script>
+
+</body>
+</html>

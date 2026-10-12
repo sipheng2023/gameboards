@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເກມລົດ ແລະ ຄົນຂ້າມທາງ (ລະບົບອັດຕະໂນມັດ)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2c3e50;
+            font-family: 'Phetsarath OT', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+
+        .timer-info {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #f1c40f;
+        }
+
+        .game-container {
+            position: relative;
+            width: 800px;
+            height: 350px;
+            background: #34495e;
+            border: 4px solid #fff;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* ຖະໜົນ */
+        .road {
+            position: absolute;
+            top: 75px;
+            width: 100%;
+            height: 200px;
+            background: #555;
+            border-top: 5px dashed #f1c40f;
+            border-bottom: 5px dashed #f1c40f;
+        }
+
+        /* ທາງມ້າລາຍ */
+        .crosswalk {
+            position: absolute;
+            left: 450px;
+            top: 75px;
+            width: 60px;
+            height: 200px;
+            background: repeating-linear-gradient(
+                to bottom,
+                white,
+                white 20px,
+                #555 20px,
+                #555 40px
+            );
+        }
+
+        /* ລົດ */
+        .car {
+            position: absolute;
+            left: -100px;
+            top: 155px;
+            width: 80px;
+            height: 40px;
+            background: #e74c3c;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        /* ລໍ້ລົດ */
+        .wheel {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #222;
+            border-radius: 50%;
+            bottom: -6px;
+        }
+        .wheel.front { right: 12px; }
+        .wheel.rear { left: 12px; }
+
+        /* ຄົນ */
+        .pedestrian {
+            position: absolute;
+            left: 470px;
+            top: 300px; /* ເລີ່ມຕົ້ນທາງລຸ່ມທາງມ້າລາຍ */
+            width: 20px;
+            height: 35px;
+            background: #3498db;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .head {
+            width: 12px;
+            height: 12px;
+            background: #f1c40f;
+            border-radius: 50%;
+            position: absolute;
+            top: -14px;
+        }
+
+        /* ໄຟຈາລະຈອນ */
+        .traffic-light-post {
+            position: absolute;
+            left: 520px;
+            top: 25px;
+            width: 10px;
+            height: 50px;
+            background: #7f8c8d;
+        }
+
+        .traffic-light {
+            position: absolute;
+            left: 500px;
+            top: 25px;
+            width: 50px;
+            height: 40px;
+            background: #222;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            padding: 2px;
+            border: 2px solid #000;
+            z-index: 4;
+        }
+
+        .light {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #555;
+        }
+
+        .light.red.active {
+            background: #e74c3c;
+            box-shadow: 0 0 10px #e74c3c;
+        }
+
+        .light.green.active {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        /* ປຸ່ມຄວບຄຸມ */
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-family: 'Phetsarath OT', Arial, sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            transition: 0.2s;
+        }
+
+        #btn-red { background: #e74c3c; }
+        #btn-red:hover { background: #c0392b; }
+
+        #btn-green { background: #2ecc71; }
+        #btn-green:hover { background: #27ae60; }
+
+        .status {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ເກມລົດ ແລະ ຄົນຂ້າມທາງຈາລະຈອນ</h1>
+    <div class="timer-info" id="timer-text">ໄຟຈະປ່ຽນອັດຕະໂນມັດໃນ: 30 ວິນາທີ</div>
+    
+    <div class="game-container">
+        <div class="road"></div>
+        <div class="crosswalk"></div>
+        
+        <!-- ໄຟຈາລະຈອນ -->
+        <div class="traffic-light-post"></div>
+        <div class="traffic-light">
+            <div id="light-red" class="light red"></div>
+            <div id="light-green" class="light green active"></div>
+        </div>
+
+        <!-- ລົດ -->
+        <div id="car" class="car">
+            <div class="wheel rear"></div>
+            <div class="wheel front"></div>
+        </div>
+
+        <!-- ຄົນ -->
+        <div id="pedestrian" class="pedestrian">
+            <div class="head"></div>
+        </div>
+    </div>
+
+    <div class="status" id="status-text">ສະຖານະ: ໄຟຂຽວ - ຄົນກຳລັງຂ້າມທາງ, ລົດຢຸດ</div>
+
+    <div class="controls">
+        <button id="btn-red" onclick="manualSetLight('red')">ບັງຄັບໄຟແດງ (ລົດໄປ)</button>
+        <button id="btn-green" onclick="manualSetLight('green')">ບັງຄັບໄຟຂຽວ (ຄົນຂ້າມ)</button>
+    </div>
+
+    <script>
+        const car = document.getElementById('car');
+        const pedestrian = document.getElementById('pedestrian');
+        const lightRed = document.getElementById('light-red');
+        const lightGreen = document.getElementById('light-green');
+        const statusText = document.getElementById('status-text');
+        const timerText = document.getElementById('timer-text');
+
+        let carX = -100;
+        let carSpeed = 3;
+        
+        let pedY = 300; 
+        let pedSpeed = 1.5;
+
+        let currentLight = 'green'; // ເລີ່ມຕົ້ນເປັນໄຟຂຽວ (ຄົນຂ້າມໄດ້)
+        let timeLeft = 30;
+
+        function setTrafficLight(color) {
+            currentLight = color;
+            if (color === 'green') {
+                lightGreen.classList.add('active');
+                lightRed.classList.remove('active');
+                statusText.innerText = "ສະຖານະ: ໄຟຂຽວ - ຄົນກຳລັງຂ້າມທາງ, ລົດຢຸດ";
+            } else {
+                lightRed.classList.add('active');
+                lightGreen.classList.remove('active');
+                statusText.innerText = "ສະຖານະ: ໄຟແດງ - ລົດແລ່ນຜ່ານ, ຄົນຢຸດລໍຖ້າ";
+            }
+        }
+
+        // ຟັງຊັນເວລາຜູ້ໃຊ້กดປຸ່ມດ້ວຍມື (ຈະຣີເຊັດເວລານັບຖອຍຫຼັງໃຫມ່)
+        function manualSetLight(color) {
+            setTrafficLight(color);
+            timeLeft = 30; // ຣີເຊັດເວລາ 30 ວິນາທີເມື່ອກົດປຸ່ມ
+        }
+
+        // ລະບົບປ່ຽນໄຟອັດຕະໂນມັດທຸກໆ 30 ວິນາທີ
+        setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                // ສະຫຼັບສີໄຟ
+                if (currentLight === 'green') {
+                    setTrafficLight('red');
+                } else {
+                    setTrafficLight('green');
+                }
+                timeLeft = 30; // ຕັ້ງເວລາ 30 ວິນາທີຄືນໃໝ່
+            }
+            timerText.innerText = `ໄຟຈະປ່ຽນອັດຕະໂນມັດໃນ: ${timeLeft} ວິນາທີ`;
+        }, 1000);
+
+        function gameLoop() {
+            // --- ຈັດການການເຄື່ອນທີ່ຂອງລົດ ---
+            let carStopPosition = 370;
+            // ຖ້າເປັນໄຟຂຽວ (ສຳລັບຄົນຂ້າມ) ລົດຕ້ອງຢຸດ
+            if (currentLight === 'green' && carX >= carStopPosition && carX < carStopPosition + 3) {
+                // ລົດຢຸດລໍຖ້າ
+            } else {
+                carX += carSpeed;
+            }
+            if (carX > 850) {
+                carX = -100;
+            }
+            car.style.left = carX + 'px';
+
+            // --- ຈັດການການເຄື່ອນທີ່ຂອງຄົນ ---
+            if (currentLight === 'green') {
+                // ໄຟຂຽວ: ຄົນຍ່າງຂ້າມທາງຈາກລຸ່ມຂຶ້ນເທິງ
+                pedY -= pedSpeed;
+                if (pedY < 40) {
+                    pedY = 300;
+                }
+            } else {
+                // ໄຟແດງ: ຄົນຢຸດລໍຖ້າຢູ່ຂອບທາງລຸ່ມ
+                pedY = 300;
+            }
+            pedestrian.style.top = pedY + 'px';
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ເລີ່ມຕົ້ນເກມ
+        gameLoop();
+    </script>
+</body>
+</html>

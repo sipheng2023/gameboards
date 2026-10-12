@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເກມທາຍຄຳສັບ ພາສາອັງກິດ ປ.4 (ພ້ອມສຽງອ່ານ)</title>
+    <style>
+        body {
+            font-family: 'Phetsarath OT', 'Saysana', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #a8e6cf, #dbede6);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #2d3436;
+        }
+        .game-container {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 680px;
+            padding: 30px;
+            text-align: center;
+            border: 5px solid #3dbf85;
+        }
+        h1 {
+            color: #1b9cf3;
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+        .subtitle {
+            color: #636e72;
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #0d47a1;
+            border: 2px solid #90caf9;
+        }
+        .question-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 8px solid #1b9cf3;
+            text-align: left;
+        }
+        .clue {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d3436;
+            line-height: 1.6;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .choice-btn-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .choice-btn {
+            flex: 1;
+            background-color: #3dbf85;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #2a8a5f;
+            text-align: left;
+        }
+        .choice-btn:hover {
+            background-color: #51d89b;
+            color: #2d3436;
+        }
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .sound-btn {
+            background-color: #ff9f43;
+            color: white;
+            border: none;
+            padding: 15px 18px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #ee5253;
+            transition: 0.2s;
+        }
+        .sound-btn:hover {
+            background-color: #feca57;
+        }
+        .sound-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .feedback {
+            font-size: 19px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 35px;
+        }
+        .next-btn {
+            background-color: #1b9cf3;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #0c7cd5;
+        }
+        .next-btn:hover {
+            background-color: #4cd137;
+        }
+        .restart-btn {
+            background-color: #3dbf85;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #2a8a5f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🔊 ເກມທາຍຄຳສັບ ພາສາອັງກິດ ປ.4 (ມີສຽງອ່ານ) 🇬🇧</h1>
+    <div class="subtitle">ກົດປຸ່ມ 🔊 ເພື່ອຟັງສຽງອອກສຽງຄຳສັບພາສາອັງກິດຢ່າງຖືກຕ້ອງ!</div>
+    
+    <div class="score-board">
+        <div>ຄຳຖາມທີ: <span id="current-q">1</span> / 10</div>
+        <div>ຄະແນນ: <span id="score">0</span> 🌟</div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-box">
+            <div id="clue" class="clue">ຄຳຖາມ...</div>
+        </div>
+        <div class="choices" id="choices-container">
+            <!-- Choices inserted via JS -->
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" class="next-btn" onclick="nextQuestion()">ຄຳຖາມຕໍ່ໄປ ➡️</button>
+    </div>
+
+    <div id="end-screen" style="display: none;">
+        <h2>🎉 ຫຼິ້ນເກມຈົບແລ້ວ! Excellent! 🎉</h2>
+        <p id="final-message" style="font-size: 20px; margin: 20px 0;"></p>
+        <button class="restart-btn" onclick="restartGame()">ຫຼິ້ນອີກຄັ້ງ 🔄</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            clue: "ຄຳສັບໃດແປວ່າ 'ປຶ້ມ / ປຶ້ມອ່ານ'?",
+            answer: "Book",
+            choices: ["Book", "Pencil", "Ruler", "Bag"]
+        },
+        {
+            clue: "ຄຳສັບໃດແປວ່າ 'ໝາ / ສຸນັກ'?",
+            answer: "Dog",
+            choices: ["Dog", "Cat", "Fish", "Rabbit"]
+        },
+        {
+            clue: "ຄຳສັບ 'Water' ແປວ່າຫຍັງ?",
+            answer: "ນ້ຳ",
+            choices: ["ນ້ຳ", "ນົມ", "ກາເຟ", "ນ້ຳໝາກໄມ້"],
+            englishChoices: ["Water", "Milk", "Coffee", "Juice"]
+        },
+        {
+            clue: "ຄຳສັບ 'Orange' ແມ່ນສີຫຍັງ ຫຼື ໝາກໄມ້ຫຍັງ?",
+            answer: "ສີສົ້ມ / ໝາກສົ້ມ",
+            choices: ["ສີສົ້ມ / ໝາກສົ້ມ", "ສີຂຽວ / ໝາກແອັບເປິ້ນ", "ສີເຫຼືອງ / ໝາກກ້ວຍ", "ສີແດງ / ໝາກແຕງໂມ"],
+            englishChoices: ["Orange", "Green", "Yellow", "Red"]
+        },
+        {
+            clue: "ຄຳສັບໃດແປວ່າ 'ຄອບຄົວ'?",
+            answer: "Family",
+            choices: ["Family", "Friend", "Teacher", "Doctor"]
+        },
+        {
+            clue: "ຄຳສັບໃດແມ່ນອະໄວຍະວະ 'ມື'?",
+            answer: "Hand",
+            choices: ["Hand", "Foot", "Head", "Leg"]
+        },
+        {
+            clue: "ຈົ່ງເລືອກຄຳສັບທີ່ຖືກຕ້ອງ: 'It is a ______.' (ມັນແມ່ນລົດບັດ/ລົດເມ)",
+            answer: "bus",
+            choices: ["bus", "car", "bike", "plane"]
+        },
+        {
+            clue: "ຄຳທັກທາຍ 'Good afternoon' ໃຊ້ທັກທາຍໃນຕອນໃດ?",
+            answer: "ຕອນສາຍ / ຕອນບ່າຍ",
+            choices: ["ຕອນສາຍ / ຕອນບ່າຍ", "ຕອນເຊົ້າ", "ຕອນແລງ", "ຕອນກາງຄືນ"],
+            englishChoices: ["Good afternoon", "Good morning", "Good evening", "Good night"]
+        },
+        {
+            clue: "ຄຳສັບ 'Sun' ແປວ່າຫຍັງ?",
+            answer: "ດວງຕາເວັນ",
+            choices: ["ດວງຕາເວັນ", "ດວງຈັນ", "ດາວ", "ກ້ອນເມກ"],
+            englishChoices: ["Sun", "Moon", "Star", "Cloud"]
+        },
+        {
+            clue: "ຈົ່ງເລືອກຄຳສັບທີ່ຖືກຕ້ອງຕື່ມໃສ່ບ່ອນຫວ່າງ: 'I ______ playing football.'",
+            answer: "like",
+            choices: ["like", "likes", "is", "are"]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function speakWord(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // cancel previous speaking
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; // slightly slower for Grade 4 students
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert('ຂໍ້ອະໄພ, ອຸປະກອນຂອງທ່ານບໍ່ຮອງຮັບການອອກສຽງ Speech Synthesis');
+        }
+    }
+
+    function loadQuestion() {
+        answered = false;
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const q = questions[currentQuestionIndex];
+        document.getElementById('current-q').textContent = currentQuestionIndex + 1;
+        document.getElementById('score').textContent = score;
+        document.getElementById('clue').textContent = "🔍 " + q.clue;
+
+        const choicesContainer = document.getElementById('choices-container');
+        choicesContainer.innerHTML = '';
+
+        // Combine logic for options with sound
+        let choicesObjList = q.choices.map((choice, index) => {
+            let soundText = q.englishChoices ? q.englishChoices[index] : choice;
+            return { choiceText: choice, soundText: soundText };
+        });
+
+        // Shuffle
+        choicesObjList.sort(() => Math.random() - 0.5);
+
+        choicesObjList.forEach(item => {
+            const container = document.createElement('div');
+            container.className = 'choice-btn-container';
+
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = item.choiceText;
+            btn.onclick = () => {
+                speakWord(item.soundText);
+                selectAnswer(item.choiceText, q.answer, btn);
+            };
+
+            const soundBtn = document.createElement('button');
+            soundBtn.className = 'sound-btn';
+            soundBtn.innerHTML = '🔊';
+            soundBtn.title = 'ຟັງສຽງອອກສຽງ';
+            soundBtn.onclick = (e) => {
+                e.stopPropagation();
+                speakWord(item.soundText);
+            };
+
+            container.appendChild(btn);
+            container.appendChild(soundBtn);
+            choicesContainer.appendChild(container);
+        });
+    }
+
+    function selectAnswer(selected, correct, buttonElement) {
+        if (answered) return;
+        answered = true;
+
+        const allButtons = document.querySelectorAll('.choice-btn');
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === correct) {
+                btn.style.backgroundColor = '#3dbf85';
+            }
+        });
+
+        const feedback = document.getElementById('feedback');
+        if (selected === correct) {
+            score++;
+            document.getElementById('score').textContent = score;
+            feedback.textContent = "✅ Correct! ຖືກຕ້ອງແລ້ວ! 🎉";
+            feedback.style.color = "#2a8a5f";
+            buttonElement.style.backgroundColor = '#3dbf85';
+        } else {
+            feedback.textContent = `❌ Incorrect! ຄຳຕອບທີ່ຖືກຕ້ອງແມ່ນ: "${correct}".`;
+            feedback.style.color = "#d63031";
+            buttonElement.style.backgroundColor = '#d63031';
+        }
+
+        if (currentQuestionIndex < questions.length - 1) {
+            document.getElementById('next-btn').style.display = 'inline-block';
+        } else {
+            setTimeout(showEndScreen, 1500);
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function showEndScreen() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        
+        const finalMessage = document.getElementById('final-message');
+        if (score === 10) {
+            finalMessage.innerHTML = `🏆 Full Score 10/10! ເຈົ້າອອກສຽງ ແລະ ຕອບໄດ້ຖືກຕ້ອງທັງໝົດ! 🌟🌟🌟`;
+        } else if (score >= 7) {
+            finalMessage.innerHTML = `⭐ Great Job! ເຈົ້າໄດ້ ${score} ຈາກ 10 ຄະແນນ! ເກັ່ງຫຼາຍ! 📖`;
+        } else {
+            finalMessage.innerHTML = `👍 Good Effort! ເຈົ້າໄດ້ ${score} ຈາກ 10 ຄະແນນ. ກົດຟັງສຽງແລ້ວລອງຫຼິ້ນໃໝ່ໄດ້ເດີ້! 🚀`;
+        }
+    }
+
+    function restartGame() {
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('end-screen').style.display = 'none';
+        loadQuestion();
+    }
+
+    // Initialize game
+    loadQuestion();
+</script>
+
+</body>
+</html>
